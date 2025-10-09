@@ -1,0 +1,25 @@
+{
+  "IN": {
+    "brick_per_piece": 6.0,
+    "cement_bag_50kg": 390.0,
+    "sand_per_cum": 1200.0,
+    "steel_per_kg": 62.0,
+    "plaster_per_sqm": 80.0,
+    "paint_per_sqm": 60.0,
+    "labor_factor": 0.18,
+    "overheads": 0.12,
+    "wastage": 0.07
+  },
+  "US": {
+    "stud_2x4_per_piece": 4.0,
+    "plate_2x4_per_lf": 1.2,
+    "osb_4x8_per_sheet": 15.0,
+    "drywall_4x8_per_sheet": 10.0,
+    "insulation_per_sf_r13": 1.5,
+    "shingle_per_bundle": 35.0,
+    "mep_allowance_per_sf": 18.0,
+    "labor_factor": 0.22,
+    "overheads": 0.15,
+    "wastage": 0.08
+  }
+}
