@@ -1,0 +1,674 @@
+{
+  "unit": "ft",
+  "per_pixel": 0.02,
+  "image_size": {
+    "w": 1600,
+    "h": 1280
+  },
+  "margin_px": 30,
+  "counts": {
+    "total": 43,
+    "exterior": 0,
+    "interior": 43
+  },
+  "totals": {
+    "sum_all_ft": 330.281,
+    "sum_exterior_ft": 0.0,
+    "sum_interior_ft": 330.281,
+    "bbox_perimeter_ft": 80.56
+  },
+  "exterior": [],
+  "interior": [
+    {
+      "index": 0,
+      "p1": [
+        52,
+        1172
+      ],
+      "p2": [
+        52,
+        41
+      ],
+      "angle_deg": 90.0,
+      "length_px": 1131.0,
+      "length_ft": 22.62,
+      "class": "interior"
+    },
+    {
+      "index": 1,
+      "p1": [
+        815,
+        1172
+      ],
+      "p2": [
+        815,
+        40
+      ],
+      "angle_deg": 90.0,
+      "length_px": 1132.0,
+      "length_ft": 22.64,
+      "class": "interior"
+    },
+    {
+      "index": 2,
+      "p1": [
+        813,
+        1172
+      ],
+      "p2": [
+        813,
+        40
+      ],
+      "angle_deg": 90.0,
+      "length_px": 1132.0,
+      "length_ft": 22.64,
+      "class": "interior"
+    },
+    {
+      "index": 3,
+      "p1": [
+        54,
+        1172
+      ],
+      "p2": [
+        54,
+        40
+      ],
+      "angle_deg": 90.0,
+      "length_px": 1132.0,
+      "length_ft": 22.64,
+      "class": "interior"
+    },
+    {
+      "index": 4,
+      "p1": [
+        895,
+        501
+      ],
+      "p2": [
+        895,
+        40
+      ],
+      "angle_deg": 90.0,
+      "length_px": 461.0,
+      "length_ft": 9.22,
+      "class": "interior"
+    },
+    {
+      "index": 5,
+      "p1": [
+        109,
+        972
+      ],
+      "p2": [
+        109,
+        98
+      ],
+      "angle_deg": 90.0,
+      "length_px": 874.0,
+      "length_ft": 17.48,
+      "class": "interior"
+    },
+    {
+      "index": 6,
+      "p1": [
+        897,
+        1030
+      ],
+      "p2": [
+        897,
+        570
+      ],
+      "angle_deg": 90.0,
+      "length_px": 460.0,
+      "length_ft": 9.2,
+      "class": "interior"
+    },
+    {
+      "index": 7,
+      "p1": [
+        111,
+        973
+      ],
+      "p2": [
+        111,
+        97
+      ],
+      "angle_deg": 90.0,
+      "length_px": 876.0,
+      "length_ft": 17.52,
+      "class": "interior"
+    },
+    {
+      "index": 8,
+      "p1": [
+        758,
+        972
+      ],
+      "p2": [
+        758,
+        98
+      ],
+      "angle_deg": 90.0,
+      "length_px": 874.0,
+      "length_ft": 17.48,
+      "class": "interior"
+    },
+    {
+      "index": 9,
+      "p1": [
+        55,
+        42
+      ],
+      "p2": [
+        897,
+        42
+      ],
+      "angle_deg": 0.0,
+      "length_px": 842.0,
+      "length_ft": 16.84,
+      "class": "interior"
+    },
+    {
+      "index": 10,
+      "p1": [
+        756,
+        973
+      ],
+      "p2": [
+        756,
+        97
+      ],
+      "angle_deg": 90.0,
+      "length_px": 876.0,
+      "length_ft": 17.52,
+      "class": "interior"
+    },
+    {
+      "index": 11,
+      "p1": [
+        53,
+        40
+      ],
+      "p2": [
+        897,
+        40
+      ],
+      "angle_deg": 0.0,
+      "length_px": 844.0,
+      "length_ft": 16.88,
+      "class": "interior"
+    },
+    {
+      "index": 12,
+      "p1": [
+        112,
+        99
+      ],
+      "p2": [
+        755,
+        99
+      ],
+      "angle_deg": 0.0,
+      "length_px": 643.0,
+      "length_ft": 12.86,
+      "class": "interior"
+    },
+    {
+      "index": 13,
+      "p1": [
+        110,
+        97
+      ],
+      "p2": [
+        757,
+        97
+      ],
+      "angle_deg": 0.0,
+      "length_px": 647.0,
+      "length_ft": 12.94,
+      "class": "interior"
+    },
+    {
+      "index": 14,
+      "p1": [
+        495,
+        1170
+      ],
+      "p2": [
+        812,
+        1170
+      ],
+      "angle_deg": 0.0,
+      "length_px": 317.0,
+      "length_ft": 6.34,
+      "class": "interior"
+    },
+    {
+      "index": 15,
+      "p1": [
+        53,
+        1172
+      ],
+      "p2": [
+        372,
+        1172
+      ],
+      "angle_deg": 0.0,
+      "length_px": 319.0,
+      "length_ft": 6.38,
+      "class": "interior"
+    },
+    {
+      "index": 16,
+      "p1": [
+        527,
+        1030
+      ],
+      "p2": [
+        896,
+        1030
+      ],
+      "angle_deg": 0.0,
+      "length_px": 369.0,
+      "length_ft": 7.38,
+      "class": "interior"
+    },
+    {
+      "index": 17,
+      "p1": [
+        55,
+        1028
+      ],
+      "p2": [
+        301,
+        1028
+      ],
+      "angle_deg": 0.0,
+      "length_px": 246.0,
+      "length_ft": 4.92,
+      "class": "interior"
+    },
+    {
+      "index": 18,
+      "p1": [
+        527,
+        973
+      ],
+      "p2": [
+        757,
+        973
+      ],
+      "angle_deg": 0.0,
+      "length_px": 230.0,
+      "length_ft": 4.6,
+      "class": "interior"
+    },
+    {
+      "index": 19,
+      "p1": [
+        528,
+        971
+      ],
+      "p2": [
+        755,
+        971
+      ],
+      "angle_deg": 0.0,
+      "length_px": 227.0,
+      "length_ft": 4.54,
+      "class": "interior"
+    },
+    {
+      "index": 20,
+      "p1": [
+        450,
+        1081
+      ],
+      "p2": [
+        529,
+        1081
+      ],
+      "angle_deg": 0.0,
+      "length_px": 79.0,
+      "length_ft": 1.58,
+      "class": "interior"
+    },
+    {
+      "index": 21,
+      "p1": [
+        299,
+        1082
+      ],
+      "p2": [
+        299,
+        971
+      ],
+      "angle_deg": 90.0,
+      "length_px": 111.0,
+      "length_ft": 2.22,
+      "class": "interior"
+    },
+    {
+      "index": 22,
+      "p1": [
+        683,
+        657
+      ],
+      "p2": [
+        683,
+        568
+      ],
+      "angle_deg": 90.0,
+      "length_px": 89.0,
+      "length_ft": 1.78,
+      "class": "interior"
+    },
+    {
+      "index": 23,
+      "p1": [
+        681,
+        517
+      ],
+      "p2": [
+        681,
+        427
+      ],
+      "angle_deg": 90.0,
+      "length_px": 90.0,
+      "length_ft": 1.8,
+      "class": "interior"
+    },
+    {
+      "index": 24,
+      "p1": [
+        301,
+        1079
+      ],
+      "p2": [
+        379,
+        1079
+      ],
+      "angle_deg": 0.0,
+      "length_px": 78.0,
+      "length_ft": 1.56,
+      "class": "interior"
+    },
+    {
+      "index": 25,
+      "p1": [
+        527,
+        1082
+      ],
+      "p2": [
+        527,
+        972
+      ],
+      "angle_deg": 90.0,
+      "length_px": 110.0,
+      "length_ft": 2.2,
+      "class": "interior"
+    },
+    {
+      "index": 26,
+      "p1": [
+        301,
+        1082
+      ],
+      "p2": [
+        301,
+        972
+      ],
+      "angle_deg": 90.0,
+      "length_px": 110.0,
+      "length_ft": 2.2,
+      "class": "interior"
+    },
+    {
+      "index": 27,
+      "p1": [
+        529,
+        1082
+      ],
+      "p2": [
+        529,
+        974
+      ],
+      "angle_deg": 90.0,
+      "length_px": 108.0,
+      "length_ft": 2.16,
+      "class": "interior"
+    },
+    {
+      "index": 28,
+      "p1": [
+        682,
+        427
+      ],
+      "p2": [
+        811,
+        427
+      ],
+      "angle_deg": 0.0,
+      "length_px": 129.0,
+      "length_ft": 2.58,
+      "class": "interior"
+    },
+    {
+      "index": 29,
+      "p1": [
+        681,
+        657
+      ],
+      "p2": [
+        811,
+        657
+      ],
+      "angle_deg": 0.0,
+      "length_px": 130.0,
+      "length_ft": 2.6,
+      "class": "interior"
+    },
+    {
+      "index": 30,
+      "p1": [
+        316,
+        44
+      ],
+      "p2": [
+        526,
+        96
+      ],
+      "angle_deg": 13.91,
+      "length_px": 216.34,
+      "length_ft": 4.327,
+      "class": "interior"
+    },
+    {
+      "index": 31,
+      "p1": [
+        681,
+        655
+      ],
+      "p2": [
+        809,
+        655
+      ],
+      "angle_deg": 0.0,
+      "length_px": 128.0,
+      "length_ft": 2.56,
+      "class": "interior"
+    },
+    {
+      "index": 32,
+      "p1": [
+        683,
+        429
+      ],
+      "p2": [
+        809,
+        429
+      ],
+      "angle_deg": 0.0,
+      "length_px": 126.0,
+      "length_ft": 2.52,
+      "class": "interior"
+    },
+    {
+      "index": 33,
+      "p1": [
+        387,
+        64
+      ],
+      "p2": [
+        514,
+        95
+      ],
+      "angle_deg": 13.72,
+      "length_px": 130.73,
+      "length_ft": 2.615,
+      "class": "interior"
+    },
+    {
+      "index": 34,
+      "p1": [
+        760,
+        454
+      ],
+      "p2": [
+        790,
+        578
+      ],
+      "angle_deg": 76.4,
+      "length_px": 127.58,
+      "length_ft": 2.552,
+      "class": "interior"
+    },
+    {
+      "index": 35,
+      "p1": [
+        530,
+        1028
+      ],
+      "p2": [
+        895,
+        1028
+      ],
+      "angle_deg": 0.0,
+      "length_px": 365.0,
+      "length_ft": 7.3,
+      "class": "interior"
+    },
+    {
+      "index": 36,
+      "p1": [
+        796,
+        519
+      ],
+      "p2": [
+        796,
+        455
+      ],
+      "angle_deg": 90.0,
+      "length_px": 64.0,
+      "length_ft": 1.28,
+      "class": "interior"
+    },
+    {
+      "index": 37,
+      "p1": [
+        895,
+        631
+      ],
+      "p2": [
+        896,
+        569
+      ],
+      "angle_deg": 90.92,
+      "length_px": 62.01,
+      "length_ft": 1.24,
+      "class": "interior"
+    },
+    {
+      "index": 38,
+      "p1": [
+        400,
+        1209
+      ],
+      "p2": [
+        400,
+        1134
+      ],
+      "angle_deg": 90.0,
+      "length_px": 75.0,
+      "length_ft": 1.5,
+      "class": "interior"
+    },
+    {
+      "index": 39,
+      "p1": [
+        759,
+        642
+      ],
+      "p2": [
+        811,
+        431
+      ],
+      "angle_deg": 103.84,
+      "length_px": 217.31,
+      "length_ft": 4.346,
+      "class": "interior"
+    },
+    {
+      "index": 40,
+      "p1": [
+        400,
+        74
+      ],
+      "p2": [
+        525,
+        43
+      ],
+      "angle_deg": 166.07,
+      "length_px": 128.79,
+      "length_ft": 2.576,
+      "class": "interior"
+    },
+    {
+      "index": 41,
+      "p1": [
+        681,
+        632
+      ],
+      "p2": [
+        682,
+        569
+      ],
+      "angle_deg": 90.91,
+      "length_px": 63.01,
+      "length_ft": 1.26,
+      "class": "interior"
+    },
+    {
+      "index": 42,
+      "p1": [
+        301,
+        96
+      ],
+      "p2": [
+        441,
+        61
+      ],
+      "angle_deg": 165.96,
+      "length_px": 144.31,
+      "length_ft": 2.886,
+      "class": "interior"
+    }
+  ],
+  "bbox_px": {
+    "minx": 52,
+    "maxx": 897,
+    "miny": 40,
+    "maxy": 1209
+  }
+}
