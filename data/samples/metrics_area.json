@@ -1,0 +1,10 @@
+{
+  "unit_linear": "ft",
+  "unit_area": "ft^2",
+  "per_pixel": 0.02,
+  "area_px2": 3104.5,
+  "area_u2": 1.2418,
+  "perimeter_px": 216.61017179489136,
+  "perimeter_u": 4.332203435897827,
+  "note": "Starter contour area (inner cavity heuristic)"
+}
