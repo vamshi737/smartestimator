@@ -1,0 +1,15 @@
+{
+  "IN": {
+    "wastage": 0.07,
+    "brick_per_piece": 8.5,
+    "cement_bag_50kg": 420,
+    "sand_per_cum": 1200,
+    "plaster_per_sqm": 160,
+
+    "paint_per_liter": 220,
+    "steel_per_kg": 62,
+    "labor_brickwork_per_m3": 750,
+    "labor_plaster_per_m2": 35,
+    "labor_paint_per_m2_per_coat": 18
+  }
+}
