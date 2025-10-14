@@ -5,11 +5,28 @@
     "cement_bag_50kg": 420,
     "sand_per_cum": 1200,
     "plaster_per_sqm": 160,
-
     "paint_per_liter": 220,
     "steel_per_kg": 62,
     "labor_brickwork_per_m3": 750,
     "labor_plaster_per_m2": 35,
     "labor_paint_per_m2_per_coat": 18
+  },
+  "US": {
+    "2x4_stud_per_piece": 3.25,
+    "2x6_stud_per_piece": 4.85,
+    "2x4_plate_per_piece": 3.10,
+    "2x6_plate_per_piece": 4.65,
+    "sheathing_4x8_per_sheet": 15.00,
+    "sheathing_4x12_per_sheet": 22.00,
+    "drywall_4x8_per_sheet": 11.00,
+    "drywall_4x12_per_sheet": 14.50,
+    "insulation_pack": 19.00,
+    "nail_each": 0.01,
+    "sheath_fastener_each": 0.02,
+    "drywall_screw_each": 0.015,
+    "labor_frame_per_stud": 1.50,
+    "labor_sheath_per_sheet": 4.00,
+    "labor_drywall_per_sheet": 8.50,
+    "labor_insul_per_pack": 3.00
   }
 }
