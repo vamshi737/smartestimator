@@ -10,6 +10,7 @@ Pipeline:
 - Excel charts (Charts sheet)
 - Comparative dashboard (Compare sheet + PNG)
 - Enhanced PDF (detailed)
+- BOQ sheet (kept at the end so it persists)
 
 Examples:
   python src/main.py --mode all --prices data/prices.json --in_height_ft 10 --us_height_ft 9
@@ -101,10 +102,13 @@ def main():
     # 6) Enhanced detailed PDF
     run([sys.executable, "src/pdf_detailed.py"])
 
+    # 7) BOQ sheet (run last so it always persists in the workbook)
+    run([sys.executable, "src/boq_excel.py"])
+
     print("")
     print("OK: Pipeline completed.")
     print("Outputs:")
-    print(" - data/output/final_estimate.xlsx (Summary, Rates, Details, Charts, Compare)")
+    print(" - data/output/final_estimate.xlsx (Summary, Rates, Details, Charts, Compare, BOQ)")
     print(" - data/output/final_estimate.pdf")
     print(" - data/output/final_estimate_detailed.pdf")
     print(" - data/output/final_breakdown.json")

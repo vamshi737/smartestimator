@@ -1,4 +1,11 @@
 {
+  "GLOBAL": {
+    "currency": "INR",
+    "overhead_pct": 5,
+    "contingency_pct": 3,
+    "profit_pct": 10,
+    "tax_pct": 18
+  },
   "IN": {
     "wastage": 0.07,
     "brick_per_piece": 8.5,
@@ -30,3 +37,4 @@
     "labor_insul_per_pack": 3.00
   }
 }
+
