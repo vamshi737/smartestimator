@@ -1,42 +1,113 @@
 # src/excel_charts.py
 """
-Adds a 'Charts' sheet to final_estimate.xlsx with:
-- Pie chart: Materials vs Labor
-- Bar chart: Overheads, Contingency, Profit, Tax
-- Grand Total callout
-
-Assumes the 'Summary' sheet has:
-Row 4: headers ["Section","Amount"]
-Rows 5..12: the 8 rows created by rates_export.py:
-  5  Materials Subtotal
-  6  Labor Subtotal
-  7  Subtotal (Materials + Labor)
-  8  Overheads
-  9  Contingency
- 10  Profit
- 11  Tax
- 12  Grand Total
+Adds:
+1) 'Charts' sheet with visuals (Pie + Bar)
+2) Enhancement data sheets:
+   - Doors_Windows  (from data/output/doors_windows.json)
+   - Flooring       (from data/output/flooring.json)
+   - Area_Summary   (from data/output/area_summary.json)
 """
 
-import sys
+import sys, os, json
 from pathlib import Path
 from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
 from openpyxl.chart import PieChart, BarChart, Reference
 
-def main():
-    xlsx_path = Path("data/output/final_estimate.xlsx")
-    if not xlsx_path.exists():
-        sys.exit("[Error] Excel not found. Run rates_export.py first to generate data/output/final_estimate.xlsx")
+# Enhancement JSON file paths
+ENH_FILES = {
+    "Doors_Windows": os.path.join("data", "output", "doors_windows.json"),
+    "Flooring":      os.path.join("data", "output", "flooring.json"),
+    "Area_Summary":  os.path.join("data", "output", "area_summary.json"),
+}
 
-    wb = load_workbook(xlsx_path)
+def read_json(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+def auto_fit(ws):
+    """Auto-size Excel columns."""
+    for col_cells in ws.columns:
+        max_length = 0
+        col = col_cells[0].column_letter
+        for cell in col_cells:
+            try:
+                if cell.value:
+                    max_length = max(max_length, len(str(cell.value)))
+            except:
+                pass
+        ws.column_dimensions[col].width = max_length + 2
+
+def add_table(ws, data):
+    """Write dict or list[dict] to the worksheet."""
+    if isinstance(data, dict):
+        r = 1
+        for k, v in data.items():
+            ws[f"A{r}"] = k
+            ws[f"B{r}"] = v
+            ws[f"A{r}"].font = Font(bold=True)
+            r += 1
+    elif isinstance(data, list):
+        if not data:
+            ws["A1"] = "No data available"
+            return
+        headers = list(data[0].keys())
+        ws.append(headers)
+        for row in data:
+            ws.append([row.get(h, "") for h in headers])
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal="center")
+    auto_fit(ws)
+
+def integrate_enhancements(wb):
+    """Add enhancement sheets if their JSONs exist."""
+    for sheet_name, path in ENH_FILES.items():
+        data = read_json(path)
+        if not data:
+            continue
+
+        # Create or clear the sheet
+        if sheet_name in wb.sheetnames:
+            ws = wb[sheetname := sheet_name]
+            for row in ws["A1:Z200"]:
+                for c in row:
+                    c.value = None
+        else:
+            ws = wb.create_sheet(sheet_name)
+
+        # Write data
+        if sheet_name == "Doors_Windows":
+            ws.append(["Category", "Type", "Count", "Area m² (each)", "Rate per m²", "Amount"])
+            for cat in ["doors", "windows"]:
+                for it in data.get(cat, []):
+                    ws.append([
+                        cat.capitalize(),
+                        it.get("type", ""),
+                        it.get("count", 0),
+                        it.get("area_m2_each", 0),
+                        it.get("rate_per_m2", 0),
+                        it.get("amount", 0),
+                    ])
+            ws.append([])
+            totals = data.get("totals", {})
+            ws.append(["", "", "", "", "Total", totals.get("total_amount", 0)])
+        elif sheet_name in ("Flooring", "Area_Summary"):
+            add_table(ws, data)
+
+        auto_fit(ws)
+
+def create_charts(wb):
+    """Your original Charts logic, unchanged."""
     if "Summary" not in wb.sheetnames:
         sys.exit("[Error] 'Summary' sheet not found. Did you generate the workbook with rates_export.py?")
 
     # Remove old Charts sheet if present (so re-runs are clean)
     if "Charts" in wb.sheetnames:
-        ws_old = wb["Charts"]
-        wb.remove(ws_old)
+        wb.remove(wb["Charts"])
 
     ws_sum = wb["Summary"]
     ws = wb.create_sheet("Charts")
@@ -81,8 +152,22 @@ def main():
     ws.column_dimensions["A"].width = 24
     ws.column_dimensions["B"].width = 20
 
-    wb.save(xlsx_path)
     print("OK: Charts added to Excel.")
+
+def main():
+    xlsx_path = Path("data/output/final_estimate.xlsx")
+    if not xlsx_path.exists():
+        sys.exit("[Error] Excel not found. Run rates_export.py first to generate data/output/final_estimate.xlsx")
+
+    wb = load_workbook(xlsx_path)
+
+    # Step 1: add enhancement sheets (non-breaking)
+    integrate_enhancements(wb)
+
+    # Step 2: rebuild Charts sheet (your original)
+    create_charts(wb)
+
+    wb.save(xlsx_path)
     print(f"Updated workbook: {xlsx_path}")
 
 if __name__ == "__main__":
