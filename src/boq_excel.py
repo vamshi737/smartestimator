@@ -1,24 +1,30 @@
 # src/boq_excel.py
 """
-Adds a 'BOQ' sheet to data/output/final_estimate.xlsx with two tables:
-- BOQ – INDIA  (bricks, cement, sand, plaster, paint area, steel, labor lines)
-- BOQ – USA    (studs, plates, sheathing, drywall, insulation, labor lines)
+Adds/updates a 'BOQ' sheet in data/output/final_estimate.xlsx with:
+- BOQ – INDIA      (bricks, plaster, paint, steel, labor lines)
+- BOQ – USA        (studs, sheathing, drywall, insulation, labor lines)
+- BOQ – OPENINGS   (Doors & Windows from data/output/doors_windows.json)
+- BOQ – FLOORING   (Flooring/Marble/Tiles from data/output/flooring.json)
+- AREAS (Info)     (wall / openings / net wall / floor / gross areas)
 
 Reads:
-  - data/output/qty_india_total.json   (optional but recommended)
-  - data/output/qty_usa.json           (optional but recommended)
-  - data/prices.json                   (to fetch IN/US rates)
-  - data/output/final_estimate.xlsx    (must exist from previous steps)
+  - data/output/qty_india_total.json
+  - data/output/qty_usa.json
+  - data/output/doors_windows.json   (optional)
+  - data/output/flooring.json        (optional)
+  - data/output/area_summary.json    (optional, info only)
+  - data/prices.json
+  - data/output/final_estimate.xlsx (must exist)
 
 Writes:
-  - Updates data/output/final_estimate.xlsx with a new/updated 'BOQ' sheet
+  - Updates data/output/final_estimate.xlsx with BOQ sheet (recreated each run)
 """
 
 from pathlib import Path
 import json, sys
 from typing import Any, Dict, List, Tuple
 
-from openpyxl import load_workbook, Workbook
+from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Font, Border, Side, numbers
 from openpyxl.utils import get_column_letter
 
@@ -76,7 +82,7 @@ def box_style(ws, rng):
             c.alignment = Alignment(vertical="center")
 
 
-# ---------- build BOQ rows ----------
+# ---------- build BOQ rows (INDIA / USA) ----------
 def build_india_boq(india: Dict[str, Any], rates_in: Dict[str, Any]) -> List[Tuple[str, str, float, float, float]]:
     """
     Returns rows: (Item, Unit, Qty, Rate, Amount)
@@ -115,27 +121,23 @@ def build_india_boq(india: Dict[str, Any], rates_in: Dict[str, Any]) -> List[Tup
 
     # Default assumptions for paint if we want a rough amount (can be adjusted later)
     coats = 2.0
-    coverage_m2_per_liter = 10.0  # 1L ~ 10 m2/coat as a common rule
+    coverage_m2_per_liter = 10.0
     liters_needed = (paint_area_m2 * coats) / coverage_m2_per_liter if coverage_m2_per_liter > 0 else 0
 
-    # India rows
     rows.append(("Bricks", "Nos", bricks_nos, r_brick, bricks_nos * r_brick))
     rows.append(("Cement (Brickwork)", "Bag", cem_bags_bw, r_cement_bag, cem_bags_bw * r_cement_bag))
     rows.append(("Sand (Brickwork)", "m3", sand_m3_bw, r_sand_cum, sand_m3_bw * r_sand_cum))
 
-    # Plastering: either use per-sqm rate if present (preferred)
+    # Plaster surface (prefer per m2 rate)
     if r_pl_sqm > 0 and pl_area_m2 > 0:
         rows.append(("Plaster (Surface)", "m2", pl_area_m2, r_pl_sqm, pl_area_m2 * r_pl_sqm))
     else:
-        # fallback to cement + sand components
         rows.append(("Plaster Cement", "Bag", pl_cem_bags, r_cement_bag, pl_cem_bags * r_cement_bag))
         rows.append(("Plaster Sand", "m3", pl_sand_m3, r_sand_cum, pl_sand_m3 * r_sand_cum))
 
-    # Paint area (labor-only estimate unless material rate is desired)
+    # Paint (labor est.)
     paint_amount_labor = paint_area_m2 * r_lab_p_m2c * coats if (paint_area_m2>0 and r_lab_p_m2c>0) else 0
     rows.append(("Paint Area (labor est., 2 coats)", "m2", paint_area_m2, r_lab_p_m2c, paint_amount_labor))
-
-    # Optional material paint cost (liters * rate) if paint_per_liter provided
     if r_paint_liter > 0 and liters_needed > 0:
         rows.append(("Paint (material est.)", "Liter", liters_needed, r_paint_liter, liters_needed * r_paint_liter))
 
@@ -151,9 +153,7 @@ def build_india_boq(india: Dict[str, Any], rates_in: Dict[str, Any]) -> List[Tup
 
 
 def build_usa_boq(usa: Dict[str, Any], rates_us: Dict[str, Any]) -> List[Tuple[str, str, float, float, float]]:
-    """
-    Returns rows: (Item, Unit, Qty, Rate, Amount) for USA framing style.
-    """
+    """Returns rows: (Item, Unit, Qty, Rate, Amount) for USA framing style."""
     rows = []
 
     studs = get_first(usa, [["framing","studs_pcs"], ["studs_pcs"], ["studs"]], 0)
@@ -166,9 +166,7 @@ def build_usa_boq(usa: Dict[str, Any], rates_us: Dict[str, Any]) -> List[Tuple[s
 
     # Rates
     r_2x4 = float(rates_us.get("2x4_stud_per_piece", 0) or 0)
-    r_2x6 = float(rates_us.get("2x6_stud_per_piece", 0) or 0)  # not used unless your qty_usa chooses 2x6
     r_pl_24 = float(rates_us.get("2x4_plate_per_piece", 0) or 0)
-    r_pl_26 = float(rates_us.get("2x6_plate_per_piece", 0) or 0)
     r_sh_48 = float(rates_us.get("sheathing_4x8_per_sheet", 0) or 0)
     r_sh_412= float(rates_us.get("sheathing_4x12_per_sheet", 0) or 0)
     r_dw_48 = float(rates_us.get("drywall_4x8_per_sheet", 0) or 0)
@@ -199,6 +197,52 @@ def build_usa_boq(usa: Dict[str, Any], rates_us: Dict[str, Any]) -> List[Tuple[s
     return rows
 
 
+# ---------- NEW: build BOQ rows (Openings + Flooring) ----------
+def build_openings_boq(doors_windows: Dict[str, Any]) -> List[Tuple[str, str, float, float, float]]:
+    """
+    From data/output/doors_windows.json
+    Each item already has 'area_m2_each', 'count', 'rate_per_m2', and 'amount'.
+    Qty = count * area_m2_each (m2). Unit = m2.
+    """
+    rows: List[Tuple[str, str, float, float, float]] = []
+    if not isinstance(doors_windows, dict):
+        return rows
+
+    for cat in ("doors", "windows"):
+        for it in doors_windows.get(cat, []):
+            area_each = float(it.get("area_m2_each", 0) or 0)
+            cnt = float(it.get("count", 0) or 0)
+            qty_m2 = area_each * cnt
+            rate = float(it.get("rate_per_m2", 0) or 0)
+            amt = float(it.get("amount", 0) or (qty_m2 * rate))
+            label = f"{cat.capitalize()} – {it.get('type', '')}".strip()
+            rows.append((label, "m2", qty_m2, rate, amt))
+
+    # optional explicit total row is handled by add_table()
+    return rows
+
+
+def build_flooring_boq(flooring: Dict[str, Any]) -> List[Tuple[str, str, float, float, float]]:
+    """
+    From data/output/flooring.json
+    Qty = total_area_m2_with_wastage (m2) if present, else area_m2.
+    """
+    rows: List[Tuple[str, str, float, float, float]] = []
+    if not isinstance(flooring, dict):
+        return rows
+
+    qty = float(
+        flooring.get("total_area_m2_with_wastage", flooring.get("area_m2", 0.0)) or 0.0
+    )
+    rate = float(flooring.get("rate_per_m2", 0) or 0)
+    amt = float(flooring.get("amount", 0) or (qty * rate))
+    material = str(flooring.get("material", "Flooring")).strip() or "Flooring"
+
+    rows.append((f"{material}", "m2", qty, rate, amt))
+    return rows
+
+
+# ---------- writer helpers ----------
 def add_table(ws, start_row, title, rows, currency_hint="INR"):
     """Writes a titled table and returns the next empty row after the table."""
     bold = Font(bold=True)
@@ -228,28 +272,61 @@ def add_table(ws, start_row, title, rows, currency_hint="INR"):
 
     end_tbl = r - 1
 
-    # Add a Total row
+    # Add a Total row (works even if there were 0 data rows - then SUM over empty range = 0)
     ws.cell(row=r, column=4, value="Total").font = bold
     ws.cell(row=r, column=5, value=f"=SUM(E{start_tbl}:E{end_tbl})").font = bold
     fmt_currency(ws, f"E{r}", currency_hint)
     r += 2  # blank line after table
 
-    box_style(ws, f"A{start_tbl-1}:E{end_tbl}")  # include header row
+    # Include header row in box
+    box_style(ws, f"A{start_tbl-1}:E{end_tbl}")
     return r
 
 
+def add_info_table(ws, start_row, title, pairs):
+    """Non-monetary info table (key/value). Returns next row."""
+    bold = Font(bold=True)
+    r = start_row
+    ws[f"A{r}"] = title
+    ws[f"A{r}"].font = Font(bold=True, size=13)
+    r += 1
+
+    ws.cell(row=r, column=1, value="Metric").font = bold
+    ws.cell(row=r, column=2, value="Value").font = bold
+    r += 1
+
+    start_tbl = r
+    for k, v in pairs:
+        ws.cell(row=r, column=1, value=k)
+        ws.cell(row=r, column=2, value=v)
+        r += 1
+    end_tbl = r - 1
+
+    box_style(ws, f"A{start_tbl-1}:B{end_tbl}")
+    r += 2
+    return r
+
+
+# ---------- main ----------
 def main():
     base = Path("data/output")
     xlsx = base / "final_estimate.xlsx"
     india_json = base / "qty_india_total.json"
     usa_json   = base / "qty_usa.json"
+    doors_windows_json = base / "doors_windows.json"
+    flooring_json      = base / "flooring.json"
+    area_summary_json  = base / "area_summary.json"
     prices_json = Path("data/prices.json")
 
     if not xlsx.exists():
         sys.exit("[Error] Excel not found: data/output/final_estimate.xlsx. Run earlier steps first.")
 
+    # Load inputs
     india = load_json(india_json, {}) or {}
     usa   = load_json(usa_json, {}) or {}
+    doors_windows = load_json(doors_windows_json, {}) or {}
+    flooring = load_json(flooring_json, {}) or {}
+    area_summary = load_json(area_summary_json, {}) or {}
     prices = load_json(prices_json, {}) or {}
 
     rates_in = prices.get("IN", {}) if isinstance(prices, dict) else {}
@@ -269,11 +346,12 @@ def main():
     ws["A1"] = "Bill of Quantities (BOQ)"
     ws["A1"].font = Font(bold=True, size=14)
 
-    # Decide currency hints (display only). We'll use GLOBAL for India if set; USA will always show USD format in amounts if currency looks USD.
+    # Currency hints
     in_currency_hint = currency_global if currency_global else "INR"
     us_currency_hint = "USD"  # display USD style for USA section
 
     r = 3
+
     # INDIA
     india_rows = build_india_boq(india, rates_in)
     r = add_table(ws, r, "BOQ – INDIA", india_rows, currency_hint=in_currency_hint)
@@ -281,6 +359,29 @@ def main():
     # USA
     usa_rows = build_usa_boq(usa, rates_us)
     r = add_table(ws, r, "BOQ – USA", usa_rows, currency_hint=us_currency_hint)
+
+    # OPENINGS (Doors & Windows)
+    open_rows = build_openings_boq(doors_windows)
+    if open_rows:
+        r = add_table(ws, r, "BOQ – OPENINGS (Doors & Windows)", open_rows,
+                      currency_hint=in_currency_hint if currency_global else "USD")
+
+    # FLOORING
+    floor_rows = build_flooring_boq(flooring)
+    if floor_rows:
+        r = add_table(ws, r, "BOQ – FLOORING", floor_rows,
+                      currency_hint=in_currency_hint if currency_global else "USD")
+
+    # AREAS (Info only)
+    if isinstance(area_summary, dict) and area_summary:
+        pairs = [
+            ("Wall Area (m²)",        float(area_summary.get("wall_area_m2", 0) or 0)),
+            ("Openings Area (m²)",    float(area_summary.get("openings_area_m2", 0) or 0)),
+            ("Net Wall Area (m²)",    float(area_summary.get("net_wall_area_m2", 0) or 0)),
+            ("Floor Area (m²)",       float(area_summary.get("floor_area_m2", 0) or 0)),
+            ("Gross Area (m²)",       float(area_summary.get("gross_area_m2", 0) or 0)),
+        ]
+        r = add_info_table(ws, r, "AREAS (Info)", pairs)
 
     autosize(ws)
     wb.save(xlsx)
