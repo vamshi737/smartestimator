@@ -7,6 +7,7 @@ Pipeline:
 - India quantities (optional)
 - USA quantities (optional)
 - Rates export (xlsx/pdf/json)
+- Enhancements (area summary, doors/windows, flooring)
 - Excel charts (Charts sheet)
 - Comparative dashboard (Compare sheet + PNG)
 - Enhanced PDF (detailed)
@@ -92,6 +93,11 @@ def main():
             "--out_pdf",  "data/output/final_estimate.pdf",
             "--out_json", "data/output/final_breakdown.json",
         ])
+
+    # 3.5) Enhancements (safe add-ons)
+    run([sys.executable, "src/enhancements/area_summary.py"])
+    run([sys.executable, "src/enhancements/doors_windows.py"])
+    run([sys.executable, "src/enhancements/flooring.py"])
 
     # 4) Excel charts (Charts sheet)
     run([sys.executable, "src/excel_charts.py"])
