@@ -1,0 +1,35 @@
+{
+  "doors": [
+    {
+      "type": "D1",
+      "width_mm": 900,
+      "height_mm": 2100,
+      "count": 0,
+      "rate_per_m2": 0.0
+    },
+    {
+      "type": "D2",
+      "width_mm": 750,
+      "height_mm": 2100,
+      "count": 0,
+      "rate_per_m2": 0.0
+    }
+  ],
+  "windows": [
+    {
+      "type": "W1",
+      "width_mm": 1200,
+      "height_mm": 1200,
+      "count": 0,
+      "rate_per_m2": 0.0
+    },
+    {
+      "type": "W2",
+      "width_mm": 900,
+      "height_mm": 900,
+      "count": 0,
+      "rate_per_m2": 0.0
+    }
+  ],
+  "notes": "Edit counts/sizes/rates. If rates are 0, prices.json may override."
+}

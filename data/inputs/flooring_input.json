@@ -1,0 +1,6 @@
+{
+  "material": "tiles",
+  "wastage_pct": 7.5,
+  "rate_per_m2": 0.0,
+  "notes": "Edit wastage% and rate. If rate=0, it will use 'flooring' rate from prices.json if found."
+}

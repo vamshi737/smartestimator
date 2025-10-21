@@ -35,19 +35,28 @@ def auto_fit(ws):
         col = col_cells[0].column_letter
         for cell in col_cells:
             try:
-                if cell.value:
+                if cell.value is not None:
                     max_length = max(max_length, len(str(cell.value)))
-            except:
+            except Exception:
                 pass
         ws.column_dimensions[col].width = max_length + 2
 
+def _to_cell_value(v):
+    """Convert Python objects to something Excel can store."""
+    if isinstance(v, (dict, list)):
+        try:
+            return json.dumps(v, ensure_ascii=False, separators=(",", ":"))
+        except Exception:
+            return str(v)
+    return v
+
 def add_table(ws, data):
-    """Write dict or list[dict] to the worksheet."""
+    """Write dict or list[dict] to the worksheet (safely)."""
     if isinstance(data, dict):
         r = 1
         for k, v in data.items():
             ws[f"A{r}"] = k
-            ws[f"B{r}"] = v
+            ws[f"B{r}"] = _to_cell_value(v)
             ws[f"A{r}"].font = Font(bold=True)
             r += 1
     elif isinstance(data, list):
@@ -57,7 +66,7 @@ def add_table(ws, data):
         headers = list(data[0].keys())
         ws.append(headers)
         for row in data:
-            ws.append([row.get(h, "") for h in headers])
+            ws.append([_to_cell_value(row.get(h, "")) for h in headers])
         for cell in ws[1]:
             cell.font = Font(bold=True)
             cell.alignment = Alignment(horizontal="center")
@@ -72,7 +81,7 @@ def integrate_enhancements(wb):
 
         # Create or clear the sheet
         if sheet_name in wb.sheetnames:
-            ws = wb[sheetname := sheet_name]
+            ws = wb[sheet_name]
             for row in ws["A1:Z200"]:
                 for c in row:
                     c.value = None
@@ -95,10 +104,10 @@ def integrate_enhancements(wb):
             ws.append([])
             totals = data.get("totals", {})
             ws.append(["", "", "", "", "Total", totals.get("total_amount", 0)])
+            auto_fit(ws)
+
         elif sheet_name in ("Flooring", "Area_Summary"):
             add_table(ws, data)
-
-        auto_fit(ws)
 
 def create_charts(wb):
     """Your original Charts logic, unchanged."""
