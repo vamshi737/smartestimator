@@ -1,0 +1,51 @@
+{
+  "doors": [
+    {
+      "type": "D1",
+      "width_mm": 900.0,
+      "height_mm": 2100.0,
+      "count": 0,
+      "area_m2_each": 1.89,
+      "rate_per_m2": 0.0,
+      "amount": 0.0
+    },
+    {
+      "type": "D2",
+      "width_mm": 750.0,
+      "height_mm": 2100.0,
+      "count": 0,
+      "area_m2_each": 1.575,
+      "rate_per_m2": 0.0,
+      "amount": 0.0
+    }
+  ],
+  "windows": [
+    {
+      "type": "W1",
+      "width_mm": 1200.0,
+      "height_mm": 1200.0,
+      "count": 0,
+      "area_m2_each": 1.44,
+      "rate_per_m2": 0.0,
+      "amount": 0.0
+    },
+    {
+      "type": "W2",
+      "width_mm": 900.0,
+      "height_mm": 900.0,
+      "count": 0,
+      "area_m2_each": 0.81,
+      "rate_per_m2": 0.0,
+      "amount": 0.0
+    }
+  ],
+  "totals": {
+    "doors_amount": 0.0,
+    "windows_amount": 0.0,
+    "total_amount": 0.0
+  },
+  "source": {
+    "manual_input": "data\\inputs\\doors_windows_input.json",
+    "metrics_used": true
+  }
+}

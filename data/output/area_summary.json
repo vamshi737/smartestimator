@@ -1,0 +1,12 @@
+{
+  "wall_area_m2": 0.0,
+  "openings_area_m2": 0.0,
+  "net_wall_area_m2": 0.0,
+  "floor_area_m2": 0.0,
+  "gross_area_m2": 0.0,
+  "source_files": {
+    "walls": "data/samples/metrics_walls.json",
+    "doors_windows": "data/output/doors_windows.json",
+    "flooring": "data/output/flooring.json"
+  }
+}

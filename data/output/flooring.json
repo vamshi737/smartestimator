@@ -1,0 +1,12 @@
+{
+  "material": "tiles",
+  "area_m2": 0.0,
+  "wastage_pct": 7.5,
+  "rate_per_m2": 0.0,
+  "total_area_m2_with_wastage": 0.0,
+  "amount": 0.0,
+  "source": {
+    "area_file": "data\\output\\area_summary.json",
+    "input_file": "data\\inputs\\flooring_input.json"
+  }
+}

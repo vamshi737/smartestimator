@@ -1,0 +1,47 @@
+{
+  "inputs": {
+    "unit_source": "ft",
+    "per_pixel": 0.02,
+    "wall_height_unit": "ft",
+    "wall_height_value": 10.0,
+    "ext_thickness_mm": 230.0,
+    "int_thickness_mm": 115.0,
+    "brick_size_mm": "190x90x90",
+    "mortar_ratio": "1:6",
+    "mortar_dry_factor": 1.33,
+    "plaster_thk_mm": 12.0,
+    "plaster_ratio": "1:4",
+    "plaster_int_sides": 2,
+    "plaster_ext_sides": 1,
+    "wastage": 0.07
+  },
+  "derived": {
+    "sum_exterior_m": 0.0,
+    "sum_interior_m": 100.6696488,
+    "vol_brickwork_m3": 35.286725297376
+  },
+  "brickwork": {
+    "bricks_nominal_vol_m3": 0.0020000000000000005,
+    "bricks_count_without_wastage": 17643.362648688,
+    "bricks_count_with_wastage": 18878.39803409616
+  },
+  "mortar_brickwork": {
+    "wet_mortar_m3": 10.5860175892128,
+    "dry_mortar_m3": 14.079403393653024,
+    "cement_bags": 57.466952627155194,
+    "sand_m3": 12.068060051702592
+  },
+  "plaster": {
+    "area_m2": 613.6821790848,
+    "wet_mortar_m3": 7.364186149017601,
+    "dry_mortar_m3": 9.352516409252354,
+    "cement_bags": 53.44295091001345,
+    "sand_m3": 7.482013127401884
+  },
+  "cost_optional": {
+    "bricks": 160466.38328981737,
+    "cement_bags": 46582.15948561083,
+    "sand_m3": 23460.087814925373,
+    "plaster_per_sqm": 98189.148653568
+  }
+}

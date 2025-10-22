@@ -1,0 +1,73 @@
+{
+  "inputs": {
+    "unit_source": "ft",
+    "sum_exterior_ft": 0.0,
+    "sum_interior_ft": 330.281,
+    "height_ft": 8.0,
+    "spacing_in": 16,
+    "stud_size": "2x4",
+    "stud_wastage_pct": 10.0,
+    "plate_stock_ft": 12,
+    "plate_wastage_pct": 10.0,
+    "sheath_sheet": "4x8",
+    "drywall_sheet": "4x12",
+    "sheath_wastage_pct": 10.0,
+    "drywall_wastage_pct": 10.0,
+    "openings_ext_sqft": 0.0,
+    "openings_int_sqft": 0.0,
+    "insul_coverage_sqft_per_pack": 40.0,
+    "insul_wastage_pct": 5.0,
+    "stud_nails_per_stud": 8,
+    "sheath_fasteners_per_sheet": 40,
+    "drywall_screws_per_sheet": 32
+  },
+  "framing": {
+    "studs_total": 273
+  },
+  "plates": {
+    "lf_base": 990.8430000000001,
+    "lf_with_waste": 1089.9273,
+    "stock_length_ft": 12.0,
+    "pieces": 91
+  },
+  "sheathing": {
+    "area_sqft": 0.0,
+    "sheet": "4x8",
+    "sheets": 0
+  },
+  "drywall": {
+    "area_sqft": 5284.496,
+    "sheet": "4x12",
+    "sheets": 122
+  },
+  "insulation": {
+    "area_sqft": 0.0,
+    "packs": 0,
+    "coverage_sqft_per_pack": 40.0
+  },
+  "fasteners": {
+    "stud_nails": 2184,
+    "sheath_fasteners": 0,
+    "drywall_screws": 3904
+  },
+  "labor": {
+    "frame": 409.5,
+    "sheathing": 0.0,
+    "drywall": 1037.0,
+    "insulation": 0.0
+  },
+  "cost_optional": {
+    "studs_material": 887.25,
+    "plates_material": 282.1,
+    "sheathing_material": 0.0,
+    "drywall_material": 1769.0,
+    "insulation_material": 0.0,
+    "nails_material": 21.84,
+    "screws_material": 58.559999999999995
+  },
+  "totals": {
+    "materials_cost_subtotal": 3018.75,
+    "labor_cost_subtotal": 1446.5,
+    "grand_total": 4465.25
+  }
+}
