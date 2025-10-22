@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent
 APP_ENV  = env("APP_ENV", "dev")
 PORT     = env("PORT", 8000, int)
 
-RUNS_DIR = Path(env("RUNS_DIR", BASE_DIR / "runs"))
+RUNS_DIR = Path(os.getenv("RUNS_DIR", "/tmp/runs"))
 RUNS_DIR.mkdir(parents=True, exist_ok=True)
 
 TESSERACT_CMD = env("TESSERACT_CMD", "")
