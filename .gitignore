@@ -1,4 +1,4 @@
-# Ignore Python virtual environment
+# Ignore Python virtual environment 
 .venv/
 
 # Ignore Python cache files
@@ -7,7 +7,13 @@ __pycache__/
 
 # Ignore log files and temporary data
 *.log
+*.tmp
 
-# Ignore generated images and output
-output/
-data/samples/edges_*.png
+# Ignore runtime or output folders
+/runs/
+/output/
+/data/temp/
+/data/samples/edges_*.png
+
+# Optional: ignore local environment config
+.env
