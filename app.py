@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import FileResponse, JSONResponse
 from uuid import uuid4
 from pathlib import Path
-import shutil, subprocess, json, os
+import shutil, subprocess, json, os, sys
 import config
 
 app = FastAPI(title="SmartEstimator API", version="1.0")
@@ -30,10 +30,14 @@ async def estimate(
     prices_path = outdir / "prices.override.json"
     prices_path.write_text(prices_json or "{}", encoding="utf-8")
 
-    # Choose your CLI path here (adjust if you use src/)
-    cli = "main.py" if Path("main.py").exists() else "src/main.py"
-    cmd = ["python", cli, "--input", str(in_path), "--prices", str(prices_path),
-           "--mode", mode, "--outdir", str(outdir)]
+    # ✅ Force using src/main.py (the updated CLI) — no auto-detection
+    cmd = [
+        sys.executable, "src/main.py",
+        "--input", str(in_path),
+        "--prices", str(prices_path),
+        "--mode", mode,
+        "--outdir", str(outdir),
+    ]
 
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
@@ -42,7 +46,7 @@ async def estimate(
             "pdf":   str(next(outdir.glob("*.pdf"), "")),
             "dir":   str(outdir)
         }
-        return {"run_id": run_id, "artifacts": artifacts, "log": proc.stdout}
+        return {"ok": True, "run_id": run_id, "artifacts": artifacts, "log": proc.stdout}
     except subprocess.CalledProcessError as e:
         return JSONResponse(status_code=500, content={"error": e.stderr})
 
