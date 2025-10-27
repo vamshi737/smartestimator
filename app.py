@@ -1,3 +1,4 @@
+# app.py
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse, PlainTextResponse
 from pathlib import Path
@@ -10,7 +11,7 @@ Path(config.RUNS_DIR).mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(title="SmartEstimator API", version="1.0")
 
-# ---------- Root page (so / is not 404) ----------
+# ---------- Root page ----------
 @app.get("/", response_class=HTMLResponse)
 def home():
     return """
@@ -19,20 +20,35 @@ def home():
 <title>SmartEstimator AI</title>
 <style>
 body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:32px;line-height:1.5}
-.card{max-width:760px;margin:auto;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-label{display:block;margin:12px 0 6px} input,select,textarea,button{font:inherit;width:100%}
-button{margin-top:16px;padding:10px 16px;border:0;border-radius:10px;background:#111827;color:#fff;cursor:pointer;width:auto}
+.card{max-width:820px;margin:auto;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+label{display:block;margin:12px 0 6px}
+input,select,textarea,button{font:inherit}
+input[type=number]{width:140px}
+button{margin-top:16px;padding:10px 16px;border:0;border-radius:10px;background:#111827;color:#fff;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.small{color:#374151;font-size:.95rem;background:#f8fafc;border:1px dashed #cbd5e1;padding:10px;border-radius:8px}
 .log{white-space:pre-wrap;background:#1118270d;border:1px dashed #cbd5e1;padding:12px;border-radius:8px;margin-top:14px}
 a{color:#2563eb}
 </style>
 </head><body>
 <div class="card">
-  <h1>SmartEstimator AI</h1>
-  <p>Upload a plan image → choose mode → get Excel/PDF.</p>
+  <h1>SmartEstimator AI — Final Test (Week 4 · Day 19)</h1>
+  <p class="small"><b>Note:</b> Current version uses internal sample dimensions; <b>OCR image reading lands next week</b>. Use the wall height inputs and pricing JSON to tune totals for now.</p>
 
   <form id="f">
-    <label>Plan image</label>
-    <input type="file" name="image" accept="image/*" required />
+    <label>Plan file (image or PDF)</label>
+    <input type="file" name="image" accept=".png,.jpg,.jpeg,.pdf" required />
+
+    <div class="grid">
+      <div>
+        <label>India wall height (ft)</label>
+        <input type="number" name="in_height_ft" value="10" step="0.1" required />
+      </div>
+      <div>
+        <label>USA wall height (ft)</label>
+        <input type="number" name="us_height_ft" value="8" step="0.1" required />
+      </div>
+    </div>
 
     <label>Mode</label>
     <select name="mode">
@@ -43,7 +59,7 @@ a{color:#2563eb}
     </select>
 
     <label>Optional price overrides (JSON)</label>
-    <textarea name="prices_json" rows="4">{}</textarea>
+    <textarea name="prices_json" rows="8" style="width:100%">{}</textarea>
 
     <button type="submit">Estimate</button>
   </form>
@@ -55,9 +71,9 @@ a{color:#2563eb}
 </div>
 
 <script>
-const form = document.getElementById('f');
-const out  = document.getElementById('out');
-const links= document.getElementById('links');
+const form  = document.getElementById('f');
+const out   = document.getElementById('out');
+const links = document.getElementById('links');
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -92,7 +108,9 @@ def health():
 async def estimate(
     image: UploadFile = File(...),
     mode: str = Form("all"),
-    prices_json: str = Form("{}")
+    prices_json: str = Form("{}"),
+    in_height_ft: float = Form(10.0),
+    us_height_ft: float = Form(8.0),
 ):
     run_id = str(uuid4())[:8]
     outdir: Path = config.RUNS_DIR / run_id
@@ -111,12 +129,15 @@ async def estimate(
     except Exception as ex:
         return JSONResponse(status_code=400, content={"error": f"prices_json invalid: {ex}"})
 
+    # Build CLI
     cmd = [
         sys.executable, "src/main.py",
         "--input", str(in_path),
         "--prices", str(prices_path),
         "--mode", mode,
         "--outdir", str(outdir),
+        "--in_height_ft", str(in_height_ft),
+        "--us_height_ft", str(us_height_ft),
     ]
 
     try:

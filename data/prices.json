@@ -6,18 +6,30 @@
     "profit_pct": 10,
     "tax_pct": 18
   },
+
   "IN": {
     "wastage": 0.07,
     "brick_per_piece": 8.5,
     "cement_bag_50kg": 420,
     "sand_per_cum": 1200,
+    "steel_per_kg": 62,
     "plaster_per_sqm": 160,
     "paint_per_liter": 220,
-    "steel_per_kg": 62,
+    "tile_floor_per_sqm": 550,
+    "granite_per_sqm": 3200,
+    "plumbing_per_sft": 85,
+    "electrical_per_sft": 70,
+    "door_wood_each": 7500,
+    "window_aluminium_each": 5500,
+    "roof_waterproof_per_sqm": 150,
     "labor_brickwork_per_m3": 750,
     "labor_plaster_per_m2": 35,
-    "labor_paint_per_m2_per_coat": 18
+    "labor_paint_per_m2_per_coat": 18,
+    "labor_tile_per_m2": 70,
+    "labor_electrical_per_sft": 12,
+    "labor_plumbing_per_sft": 15
   },
+
   "US": {
     "2x4_stud_per_piece": 3.25,
     "2x6_stud_per_piece": 4.85,
@@ -28,13 +40,25 @@
     "drywall_4x8_per_sheet": 11.00,
     "drywall_4x12_per_sheet": 14.50,
     "insulation_pack": 19.00,
+    "asphalt_shingle_per_sft": 2.50,
+    "vinyl_floor_per_sft": 3.20,
+    "ceramic_tile_per_sft": 5.00,
+    "paint_per_gallon": 38.00,
+    "toilet_fixture_each": 150.00,
+    "sink_fixture_each": 110.00,
+    "electrical_wiring_per_sft": 2.00,
+    "light_fixture_each": 45.00,
+    "window_unit_each": 250.00,
+    "door_unit_each": 180.00,
     "nail_each": 0.01,
-    "sheath_fastener_each": 0.02,
     "drywall_screw_each": 0.015,
     "labor_frame_per_stud": 1.50,
     "labor_sheath_per_sheet": 4.00,
     "labor_drywall_per_sheet": 8.50,
-    "labor_insul_per_pack": 3.00
+    "labor_insul_per_pack": 3.00,
+    "labor_paint_per_gallon": 30.00,
+    "labor_floor_per_sft": 4.00,
+    "labor_electrical_per_sft": 2.50,
+    "labor_plumbing_fixture": 45.00
   }
 }
-
