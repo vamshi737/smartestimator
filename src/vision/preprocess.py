@@ -122,7 +122,7 @@ def preprocess(input_path: Path, output_path: Path, deskew: bool = False) -> Non
     ok = cv2.imwrite(str(output_path), bw)
     if not ok:
         raise SystemExit(f"[ERR] Failed to write output: {output_path}")
-    print(f"[OK] Preprocessed image saved → {output_path}")
+    print(f"[OK] Preprocessed image saved  {output_path}")
 
 
 def main():

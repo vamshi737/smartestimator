@@ -1,10 +1,12 @@
 # src/main.py
 """
-End-to-end runner for SmartEstimator (Week 4 build).
+End-to-end runner for SmartEstimator (Week 5 Day 23 build).
 Copies final artifacts to --outdir for the API to serve.
+- NEW: Prefer OCR geometry (data/output/metrics_*.json) when available and valid.
+- Fallback: Use original sample walls (data/samples/metrics_walls.json) with manual heights.
 """
 
-import argparse, subprocess, sys, shutil
+import argparse, subprocess, sys, shutil, json
 from pathlib import Path
 
 def run(cmd, cwd=None):
@@ -23,6 +25,14 @@ def copy_if_exists(src: Path, dst_dir: Path):
         print(f"[copy] {src} -> {dst_dir / src.name}")
     else:
         print(f"[warn] artifact not found: {src}")
+
+def load_json_silent(path: Path):
+    try:
+        if path.exists():
+            return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    return None
 
 def main():
     ap = argparse.ArgumentParser(description="SmartEstimator one-shot runner")
@@ -57,9 +67,28 @@ def main():
     if args.input_image:
         print(f"[info] Received --input {args.input_image} (not used by this pipeline).")
 
-    walls_json = "data/samples/metrics_walls.json"
-    if not file_exists(walls_json):
-        print(f"[Warn] {walls_json} not found. Run your Week-1 wall metrics step first.")
+    # -----------------------------
+    # Day 23: Prefer OCR geometry
+    # -----------------------------
+    default_walls_json = "data/samples/metrics_walls.json"
+    if not file_exists(default_walls_json):
+        print(f"[warn] {default_walls_json} not found. Run your Week-1 wall metrics step first.")
+
+    ocr_walls_path = Path("data/output/metrics_walls.json")
+    ocr_area_path  = Path("data/output/metrics_area.json")
+    ocr_walls = load_json_silent(ocr_walls_path)
+    ocr_area  = load_json_silent(ocr_area_path)
+
+    use_ocr = False
+    if ocr_walls and float(ocr_walls.get("total_perimeter_ft", 0)) > 0:
+        walls_json = str(ocr_walls_path)
+        use_ocr = True
+        print("[info] Using OCR geometry:", walls_json)
+        if ocr_area:
+            print(f"[info] OCR total area (sqft): {ocr_area.get('total_area_sqft', 0)}")
+    else:
+        walls_json = default_walls_json
+        print("[info] OCR geometry not available/invalid; using default walls JSON:", walls_json)
 
     # 1) INDIA quantities
     if args.mode in ("india","both","all"):
