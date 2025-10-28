@@ -1,8 +1,8 @@
 group,metric,value,unit
-brickwork,volume,35.286725297376,m3
-brickwork,bricks (with wastage),18878.39803409616,nos
-mortar,cement bags (brickwork),57.466952627155194,bag
-mortar,sand (brickwork),12.068060051702592,m3
-plaster,area,613.6821790848,m2
-plaster,cement bags,53.44295091001345,bag
-plaster,sand,7.482013127401884,m3
+brickwork,volume,0.0,m3
+brickwork,bricks (with wastage),0.0,nos
+mortar,cement bags (brickwork),0.0,bag
+mortar,sand (brickwork),0.0,m3
+plaster,area,0.0,m2
+plaster,cement bags,0.0,bag
+plaster,sand,0.0,m3

@@ -17,36 +17,36 @@
   },
   "derived_base": {
     "sum_exterior_m": 0.0,
-    "sum_interior_m": 100.6696488,
-    "vol_brickwork_m3": 35.286725297376
+    "sum_interior_m": 0.0,
+    "vol_brickwork_m3": 0.0
   },
   "brickwork_base": {
     "bricks_nominal_vol_m3": 0.0020000000000000005,
-    "bricks_count_without_wastage": 17643.362648688,
-    "bricks_count_with_wastage": 18878.39803409616
+    "bricks_count_without_wastage": 0.0,
+    "bricks_count_with_wastage": 0.0
   },
   "mortar_brickwork_base": {
-    "wet_mortar_m3": 10.5860175892128,
-    "dry_mortar_m3": 14.079403393653024,
-    "cement_bags": 57.466952627155194,
-    "sand_m3": 12.068060051702592
+    "wet_mortar_m3": 0.0,
+    "dry_mortar_m3": 0.0,
+    "cement_bags": 0.0,
+    "sand_m3": 0.0
   },
   "plaster_base": {
-    "area_m2": 613.6821790848,
-    "wet_mortar_m3": 7.364186149017601,
-    "dry_mortar_m3": 9.352516409252354,
-    "cement_bags": 53.44295091001345,
-    "sand_m3": 7.482013127401884
+    "area_m2": 0.0,
+    "wet_mortar_m3": 0.0,
+    "dry_mortar_m3": 0.0,
+    "cement_bags": 0.0,
+    "sand_m3": 0.0
   },
   "paint": {
-    "interior_area_m2": 306.8410895424,
+    "interior_area_m2": 0.0,
     "exterior_area_m2": 0.0,
     "interior_coats": 2,
     "exterior_coats": 2,
     "coverage_m2_per_liter": 10.0,
-    "interior_liters": 61.368217908480005,
+    "interior_liters": 0.0,
     "exterior_liters": 0.0,
-    "total_liters": 61.368217908480005
+    "total_liters": 0.0
   },
   "steel_basic": {
     "lintel_length_m": 0.0,
@@ -67,28 +67,26 @@
       "paint_per_m2_per_coat": 0.0
     },
     "quantities": {
-      "brickwork_m3": 35.286725297376,
-      "plaster_m2": 613.6821790848,
-      "paint_m2_total_coats": 613.6821790848
+      "brickwork_m3": 0.0,
+      "plaster_m2": 0.0,
+      "paint_m2_total_coats": 0.0
     },
     "costs": {
-      "brickwork_labor": 26465.043973032,
-      "plaster_labor": 21478.876267968,
-      "paint_labor": 11046.2792235264
+      "brickwork_labor": 0.0,
+      "plaster_labor": 0.0,
+      "paint_labor": 0.0
     },
-    "total_labor": 58990.1994645264
+    "total_labor": 0.0
   },
   "cost_optional": {
-    "bricks": 160466.38328981737,
-    "cement_bags": 46582.15948561083,
-    "sand_m3": 23460.087814925373,
-    "plaster_per_sqm": 98189.148653568,
-    "paint_material": 13501.007939865602,
-    "steel_material": 0.0
+    "bricks": 0.0,
+    "cement_bags": 0.0,
+    "sand_m3": 0.0,
+    "plaster_per_sqm": 0.0
   },
   "totals": {
-    "materials_cost_subtotal": 342198.7871837872,
-    "labor_cost_subtotal": 58990.1994645264,
-    "grand_total": 401188.9866483136
+    "materials_cost_subtotal": 0.0,
+    "labor_cost_subtotal": 0.0,
+    "grand_total": 0.0
   }
 }

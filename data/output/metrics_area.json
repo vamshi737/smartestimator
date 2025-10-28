@@ -1,0 +1,11 @@
+{
+  "rooms": [
+    {
+      "id": 1,
+      "width_ft": 10.0,
+      "height_ft": 10.0,
+      "area_sqft": 100.0
+    }
+  ],
+  "total_area_sqft": 100.0
+}

@@ -1,14 +1,14 @@
 {
   "inputs": {
-    "prices_path": "data\\prices.json",
+    "prices_path": "\\tmp\\runs\\bd790097\\prices.override.json",
     "india_path": "data\\output\\qty_india_total.json",
     "usa_path": "data\\output\\qty_usa.json",
-    "currency": "INR"
+    "currency": ""
   },
   "subtotals": {
     "india": {
-      "materials": 342198.7871837872,
-      "labor": 58990.1994645264
+      "materials": 0.0,
+      "labor": 0.0
     },
     "usa": {
       "materials": 3018.75,
@@ -16,17 +16,17 @@
     }
   },
   "summary": {
-    "materials": 345217.5371837872,
-    "labor": 60436.6994645264,
-    "overheads": 20282.71183241568,
-    "contingency": 12778.108454421877,
-    "profit": 43871.505693515115,
-    "tax": 86865.58127315991,
-    "grand_total": 569452.1439018261,
-    "overhead_pct": 5.0,
-    "contingency_pct": 3.0,
-    "profit_pct": 10.0,
-    "tax_pct": 18.0,
-    "currency": "INR"
+    "materials": 3018.75,
+    "labor": 1446.5,
+    "overheads": 0.0,
+    "contingency": 0.0,
+    "profit": 0.0,
+    "tax": 0.0,
+    "grand_total": 4465.25,
+    "overhead_pct": 0.0,
+    "contingency_pct": 0.0,
+    "profit_pct": 0.0,
+    "tax_pct": 0.0,
+    "currency": ""
   }
 }
