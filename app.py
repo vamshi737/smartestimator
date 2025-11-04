@@ -1,164 +1,209 @@
-# app.py
-from fastapi import FastAPI, UploadFile, File, Form
-from fastapi.responses import FileResponse, JSONResponse, HTMLResponse, PlainTextResponse
+# app.py — Week5 Day24: UI -> OCR live integration with safe fallback
+import os, sys, json, uuid, shutil, subprocess
 from pathlib import Path
-from uuid import uuid4
-import shutil, subprocess, json, sys
-import config
+from typing import Optional
 
-# Ensure runs dir exists
-Path(config.RUNS_DIR).mkdir(parents=True, exist_ok=True)
+from fastapi import FastAPI, File, Form, UploadFile
+from fastapi.responses import HTMLResponse, FileResponse, PlainTextResponse
 
-app = FastAPI(title="SmartEstimator API", version="1.0")
+APP_ROOT = Path(__file__).parent.resolve()
+DATA_DIR = APP_ROOT / "data" / "output"
+RUNS_DIR = APP_ROOT / "runs"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+RUNS_DIR.mkdir(parents=True, exist_ok=True)
 
-# ---------- Root page ----------
-@app.get("/", response_class=HTMLResponse)
-def home():
-    return """
-<!doctype html><html><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>SmartEstimator AI</title>
-<style>
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:32px;line-height:1.5}
-.card{max-width:820px;margin:auto;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-label{display:block;margin:12px 0 6px}
-input,select,textarea,button{font:inherit}
-input[type=number]{width:140px}
-button{margin-top:16px;padding:10px 16px;border:0;border-radius:10px;background:#111827;color:#fff;cursor:pointer}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.small{color:#374151;font-size:.95rem;background:#f8fafc;border:1px dashed #cbd5e1;padding:10px;border-radius:8px}
-.log{white-space:pre-wrap;background:#1118270d;border:1px dashed #cbd5e1;padding:12px;border-radius:8px;margin-top:14px}
-a{color:#2563eb}
-</style>
-</head><body>
-<div class="card">
-  <h1>SmartEstimator AI — Final Test (Week 4 · Day 19)</h1>
-  <p class="small"><b>Note:</b> Current version uses internal sample dimensions; <b>OCR image reading lands next week</b>. Use the wall height inputs and pricing JSON to tune totals for now.</p>
+app = FastAPI(title="SmartEstimator AI — Week 5 Day 24")
 
-  <form id="f">
-    <label>Plan file (image or PDF)</label>
-    <input type="file" name="image" accept=".png,.jpg,.jpeg,.pdf" required />
+def run(cmd, cwd=None) -> int:
+    """Run a subprocess and stream output."""
+    print("->", " ".join(cmd))
+    r = subprocess.run(cmd, cwd=cwd)
+    return r.returncode
 
-    <div class="grid">
-      <div>
-        <label>India wall height (ft)</label>
-        <input type="number" name="in_height_ft" value="10" step="0.1" required />
-      </div>
-      <div>
-        <label>USA wall height (ft)</label>
-        <input type="number" name="us_height_ft" value="8" step="0.1" required />
-      </div>
-    </div>
+def safe_json_parse(s: str) -> Optional[dict]:
+    s = (s or "").strip()
+    if not s:
+        return None
+    try:
+        return json.loads(s)
+    except Exception as e:
+        print("JSON parse error:", e)
+        return None
 
-    <label>Mode</label>
-    <select name="mode">
-      <option value="all" selected>all (India+USA+reports)</option>
-      <option value="india">india</option>
-      <option value="usa">usa</option>
-      <option value="both">both</option>
-    </select>
-
-    <label>Optional price overrides (JSON)</label>
-    <textarea name="prices_json" rows="8" style="width:100%">{}</textarea>
-
-    <button type="submit">Estimate</button>
-  </form>
-
-  <div id="out" class="log"></div>
-  <div id="links"></div>
-
-  <p style="margin-top:12px">Health: <a href="/health" target="_blank">/health</a></p>
-</div>
-
-<script>
-const form  = document.getElementById('f');
-const out   = document.getElementById('out');
-const links = document.getElementById('links');
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  out.textContent = 'Running…';
-  links.innerHTML = '';
-  const fd = new FormData(form);
-  try {
-    const r = await fetch('/estimate', { method:'POST', body: fd });
-    const data = await r.json();
-    if (!r.ok || !data.ok) {
-      out.textContent = 'Error: ' + (data.error || r.statusText);
-      return;
-    }
-    out.textContent = 'OK  Run: ' + data.run_id;
-    const run = data.run_id;
-    const excel = (data.artifacts.excel||'').split(/[\\\\/]/).pop();
-    const pdf   = (data.artifacts.pdf||'').split(/[\\\\/]/).pop();
-    if (excel) links.innerHTML += `<p><a href="/download/${run}/${excel}">Download Excel</a></p>`;
-    if (pdf)   links.innerHTML += `<p><a href="/download/${run}/${pdf}">Download PDF</a></p>`;
-  } catch (e) { out.textContent = 'Request failed: ' + e; }
-});
-</script>
-</body></html>
-    """
-
-# ---------- API ----------
 @app.get("/health")
 def health():
     return {"ok": True}
 
-@app.post("/estimate")
+@app.get("/", response_class=HTMLResponse)
+def form():
+    return f"""
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>SmartEstimator AI — Final Test (Week 5 · Day 24)</title>
+    <link rel="icon" href="data:,">
+    <style>
+      body {{ font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#f8fafc; }}
+      .wrap {{ max-width: 880px; margin: 30px auto; background:#fff; padding:28px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,.08); }}
+      label {{ font-weight: 600; }}
+      input[type="number"], select, textarea {{ width:100%; padding:10px; margin:8px 0 16px; }}
+      .row {{ display:flex; gap:18px; }}
+      .col {{ flex:1; }}
+      .note {{ background:#eef6ff; border:1px dashed #84a9ff; padding:12px 14px; border-radius:10px; color:#173b6d; }}
+      .btn {{ background:#111827; color:#fff; border:0; padding:10px 18px; border-radius:10px; cursor:pointer; }}
+      .small {{ color:#666; font-size:12px; }}
+      .links a {{ display:inline-block; margin-right:12px; }}
+      code {{ background:#f1f5f9; padding:2px 6px; border-radius:6px; }}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h2>SmartEstimator AI — Week 5 · Day 24 (UI → OCR)</h2>
+      <p class="note"><strong>Note:</strong> Current version reads dimensions via OCR from your uploaded plan. If OCR confidence is low or a step fails, we safely fallback to the internal sample metrics. Use the wall height fields and optional pricing JSON to tune totals.</p>
+
+      <form action="/estimate" method="post" enctype="multipart/form-data">
+        <label>Plan file (image or PDF)</label><br/>
+        <input type="file" name="plan" required/>
+
+        <div class="row">
+          <div class="col">
+            <label>India wall height (ft)</label>
+            <input type="number" step="0.1" name="in_height" value="10"/>
+          </div>
+          <div class="col">
+            <label>USA wall height (ft)</label>
+            <input type="number" step="0.1" name="us_height" value="8"/>
+          </div>
+        </div>
+
+        <label>Mode</label>
+        <select name="mode">
+          <option value="india">india</option>
+          <option value="usa">usa</option>
+          <option value="both" selected>both</option>
+        </select>
+
+        <label>Optional price overrides (JSON)</label>
+        <textarea name="prices_json" rows="7" placeholder='{{"GLOBAL":{{"currency":"INR"}}}}'></textarea>
+
+        <button class="btn" type="submit">Estimate</button>
+      </form>
+
+      <p class="small" style="margin-top:16px;">Health: <a href="/health">/health</a></p>
+    </div>
+  </body>
+</html>
+    """
+
+@app.post("/estimate", response_class=HTMLResponse)
 async def estimate(
-    image: UploadFile = File(...),
-    mode: str = Form("all"),
-    prices_json: str = Form("{}"),
-    in_height_ft: float = Form(10.0),
-    us_height_ft: float = Form(8.0),
+    plan: UploadFile = File(...),
+    in_height: float = Form(10.0),
+    us_height: float = Form(8.0),
+    mode: str = Form("both"),
+    prices_json: str = Form("")
 ):
-    run_id = str(uuid4())[:8]
-    outdir: Path = config.RUNS_DIR / run_id
-    outdir.mkdir(parents=True, exist_ok=True)
+    # 1) Create run workspace
+    run_id = uuid.uuid4().hex[:8]
+    run_dir = RUNS_DIR / run_id
+    out_dir = run_dir / "out"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Save input
-    in_path = outdir / image.filename
-    with in_path.open("wb") as f:
-        shutil.copyfileobj(image.file, f)
+    # 2) Save upload
+    plan_ext = Path(plan.filename).suffix.lower() or ".png"
+    plan_path = run_dir / ("plan" + plan_ext)
+    with open(plan_path, "wb") as f:
+        f.write(await plan.read())
 
-    # Optional price override (validate quickly)
-    prices_path = outdir / "prices.override.json"
-    try:
-        json.loads(prices_json or "{}")
-        prices_path.write_text(prices_json or "{}", encoding="utf-8")
-    except Exception as ex:
-        return JSONResponse(status_code=400, content={"error": f"prices_json invalid: {ex}"})
+    # 3) Optional price overrides
+    custom_prices = safe_json_parse(prices_json)
+    prices_path = APP_ROOT / "data" / "prices.json"
+    # If user pasted JSON, write a temp file and point to it
+    if custom_prices:
+        temp_prices = run_dir / "prices_overrides.json"
+        with open(temp_prices, "w", encoding="utf-8") as f:
+            json.dump(custom_prices, f, indent=2)
+        prices_path = temp_prices
 
-    # Build CLI
-    cmd = [
+    # 4) OCR pipeline (preprocess -> OCR -> geometry)
+    ocr_ok = True
+    preproc = run_dir / "preproc.png"
+    ocr_json = DATA_DIR / "ocr_dims.json"              # keep paths consistent with src tools
+    area_json = DATA_DIR / "metrics_area.json"
+    walls_json = DATA_DIR / "metrics_walls.json"
+
+    # clean previous metrics so we know if OCR produced them
+    for p in (ocr_json, area_json, walls_json):
+        try:
+            if p.exists(): p.unlink()
+        except Exception:
+            pass
+
+    # preprocess
+    code = run([sys.executable, "src/vision/preprocess.py",
+                "--input", str(plan_path),
+                "--out", str(preproc),
+                "--deskew"])
+    if code != 0 or not preproc.exists():
+        ocr_ok = False
+
+    # OCR dims
+    if ocr_ok:
+        code = run([sys.executable, "src/vision/ocr_dims.py",
+                    "--input", str(preproc),
+                    "--out", str(ocr_json)])
+        if code != 0 or not ocr_json.exists():
+            ocr_ok = False
+
+    # Geometry mapping
+    if ocr_ok:
+        code = run([sys.executable, "src/vision/geometry_from_dims.py",
+                    "--ocr", str(ocr_json),
+                    "--out_area", str(area_json),
+                    "--out_walls", str(walls_json)])
+        if code != 0 or not walls_json.exists():
+            ocr_ok = False
+
+    # 5) Main pipeline (now prefers OCR geometry automatically if present)
+    code = run([
         sys.executable, "src/main.py",
-        "--input", str(in_path),
-        "--prices", str(prices_path),
         "--mode", mode,
-        "--outdir", str(outdir),
-        "--in_height_ft", str(in_height_ft),
-        "--us_height_ft", str(us_height_ft),
-    ]
+        "--prices", str(prices_path),
+        "--in_height_ft", str(in_height),
+        "--us_height_ft", str(us_height),
+        "--outdir", str(out_dir)
+    ])
+    if code != 0:
+        return HTMLResponse(
+            f"<h3>Run failed.</h3><p>Check server logs.</p>",
+            status_code=500
+        )
 
-    try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        artifacts = {
-            "excel": str(next(outdir.glob("*.xlsx"), "")),
-            "pdf":   str(next(outdir.glob("*.pdf"), "")),
-            "dir":   str(outdir)
-        }
-        return {"ok": True, "run_id": run_id, "artifacts": artifacts, "log": proc.stdout}
-    except subprocess.CalledProcessError as e:
-        return JSONResponse(status_code=500, content={"error": e.stderr or e.stdout})
+    # 6) Links to outputs
+    links = []
+    for name in ["final_estimate.xlsx", "final_estimate.pdf",
+                 "final_estimate_detailed.pdf", "final_breakdown.json",
+                 "compare_preview.png"]:
+        p = out_dir / name
+        if p.exists():
+            links.append(f'<a href="/download/{run_id}/{name}">{name}</a>')
+
+    ocr_msg = "OCR geometry used" if (ocr_ok and walls_json.exists()) else "Fallback to sample metrics"
+
+    return HTMLResponse(f"""
+    <div class="wrap" style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; max-width:880px; margin:30px auto">
+      <h3>Run complete (run-id: {run_id})</h3>
+      <p><b>Status:</b> {ocr_msg}</p>
+      <div class="links">{' | '.join(links)}</div>
+      <p style="margin-top:16px"><a href="/">⟵ New estimate</a></p>
+    </div>
+    """)
 
 @app.get("/download/{run_id}/{filename}")
 def download(run_id: str, filename: str):
-    path = config.RUNS_DIR / run_id / filename
-    if not path.exists():
-        return JSONResponse(status_code=404, content={"error": "file not found"})
-    return FileResponse(path)
-
-# Optional robots.txt
-@app.get("/robots.txt", response_class=PlainTextResponse)
-def robots():
-    return "User-agent: *\nDisallow: /"
+    p = RUNS_DIR / run_id / "out" / filename
+    if not p.exists():
+        return PlainTextResponse("File not found", status_code=404)
+    return FileResponse(path=p, filename=filename)
