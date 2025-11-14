@@ -1,22 +1,31 @@
 # src/main.py
 """
-End-to-end runner for SmartEstimator (Week 5 Day 23 build).
-Copies final artifacts to --outdir for the API to serve.
-- NEW: Prefer OCR geometry (data/output/metrics_*.json) when available and valid.
-- Fallback: Use original sample walls (data/samples/metrics_walls.json) with manual heights.
+End-to-end runner for SmartEstimator — Week 5 Day 24 (OCR-first compatible)
+
+What’s new vs your previous Day-23 script:
+- Accepts optional geometry args from app.py:
+    --metrics_area, --metrics_walls, --metrics_source
+- Prefer OCR metrics when provided (or when data/output/metrics_*.json exist)
+- Correctly reads totals from the new JSON schema:
+    area:  payload["totals"]["total_area_ft2"]
+    walls: payload["totals"]["total_wall_length_ft"]  (or len(segments)>0)
 """
 
 import argparse, subprocess, sys, shutil, json
 from pathlib import Path
+from typing import Optional
+
 
 def run(cmd, cwd=None):
-    print("-> " + " ".join(cmd))
+    print("-> " + " ".join(map(str, cmd)))
     r = subprocess.run(cmd, cwd=cwd)
     if r.returncode != 0:
         sys.exit(r.returncode)
 
-def file_exists(p):
+
+def file_exists(p) -> bool:
     return Path(p).exists()
+
 
 def copy_if_exists(src: Path, dst_dir: Path):
     if src.exists():
@@ -26,7 +35,8 @@ def copy_if_exists(src: Path, dst_dir: Path):
     else:
         print(f"[warn] artifact not found: {src}")
 
-def load_json_silent(path: Path):
+
+def load_json_silent(path: Path) -> Optional[dict]:
     try:
         if path.exists():
             return json.loads(path.read_text(encoding="utf-8"))
@@ -34,9 +44,10 @@ def load_json_silent(path: Path):
         pass
     return None
 
+
 def main():
-    ap = argparse.ArgumentParser(description="SmartEstimator one-shot runner")
-    ap.add_argument("--mode", choices=["india","usa","both","all"], default="all",
+    ap = argparse.ArgumentParser(description="SmartEstimator one-shot runner (Day-24)")
+    ap.add_argument("--mode", choices=["india", "usa", "both", "all"], default="all",
                     help="'all' = india + usa + exports + charts + pdf")
     ap.add_argument("--prices", default="data/prices.json")
 
@@ -50,11 +61,16 @@ def main():
     ap.add_argument("--us_openings_ext_sqft", type=float, default=0.0)
     ap.add_argument("--us_openings_int_sqft", type=float, default=0.0)
 
-    # API flags
+    # API flags (input not used by pipeline, kept for backwards-compat)
     ap.add_argument("--input", dest="input_image", default=None,
-                    help="Optional path to input plan image (not used by current pipeline)")
+                    help="Optional path to input plan image (not used by this pipeline)")
     ap.add_argument("--outdir", default="data/output",
                     help="Directory to copy final artifacts for API/download")
+
+    # NEW — Day 24 OCR-first geometry hooks (harmless if not passed)
+    ap.add_argument("--metrics_area", type=str, default=None)
+    ap.add_argument("--metrics_walls", type=str, default=None)
+    ap.add_argument("--metrics_source", choices=["ocr", "sample"], default="ocr")
 
     args = ap.parse_args()
 
@@ -68,35 +84,58 @@ def main():
         print(f"[info] Received --input {args.input_image} (not used by this pipeline).")
 
     # -----------------------------
-    # Day 23: Prefer OCR geometry
+    # Day 24: Prefer OCR geometry
     # -----------------------------
-    default_walls_json = "data/samples/metrics_walls.json"
-    if not file_exists(default_walls_json):
-        print(f"[warn] {default_walls_json} not found. Run your Week-1 wall metrics step first.")
+    # Choose candidate paths
+    area_candidate = Path(args.metrics_area) if args.metrics_area else DATA_OUTPUT / "metrics_area.json"
+    walls_candidate = Path(args.metrics_walls) if args.metrics_walls else DATA_OUTPUT / "metrics_walls.json"
 
-    ocr_walls_path = Path("data/output/metrics_walls.json")
-    ocr_area_path  = Path("data/output/metrics_area.json")
-    ocr_walls = load_json_silent(ocr_walls_path)
-    ocr_area  = load_json_silent(ocr_area_path)
+    # Load payloads (if present)
+    area_payload = load_json_silent(area_candidate) or {}
+    walls_payload = load_json_silent(walls_candidate) or {}
+
+    # Detect OCR validity from new schema
+    def _walls_ok(wp: dict) -> bool:
+        totals = (wp.get("totals") or {})
+        total_len = float(totals.get("total_wall_length_ft", 0.0))
+        segs = wp.get("walls") or wp.get("segments") or []
+        return total_len > 0.0 or len(segs) > 0
+
+    def _area_info(apl: dict) -> float:
+        totals = (apl.get("totals") or {})
+        return float(totals.get("total_area_ft2", 0.0))
 
     use_ocr = False
-    if ocr_walls and float(ocr_walls.get("total_perimeter_ft", 0)) > 0:
-        walls_json = str(ocr_walls_path)
-        use_ocr = True
-        print("[info] Using OCR geometry:", walls_json)
-        if ocr_area:
-            print(f"[info] OCR total area (sqft): {ocr_area.get('total_area_sqft', 0)}")
+    geometry_source = args.metrics_source
+
+    if geometry_source == "ocr" and file_exists(walls_candidate):
+        if _walls_ok(walls_payload):
+            use_ocr = True
+        else:
+            print("[warn] OCR walls JSON present but empty/invalid; will fallback to sample.")
+            geometry_source = "sample"
+
+    default_walls_json = Path("data/samples/metrics_walls.json")
+    if geometry_source == "sample":
+        if not default_walls_json.exists():
+            print(f"[warn] {default_walls_json} not found. Run Week-1 wall metrics step to generate samples.")
+        walls_candidate = default_walls_json
+
+    # Log what we’re using
+    if use_ocr:
+        print(f"[info] Using OCR geometry: {walls_candidate}")
+        if area_payload:
+            print(f"[info] OCR total area (ft²): {_area_info(area_payload)}")
     else:
-        walls_json = default_walls_json
-        print("[info] OCR geometry not available/invalid; using default walls JSON:", walls_json)
+        print(f"[info] Using SAMPLE geometry: {walls_candidate}")
 
     # 1) INDIA quantities
-    if args.mode in ("india","both","all"):
+    if args.mode in ("india", "both", "all"):
         run([sys.executable, "src/qty_india.py",
              "--height", str(args.in_height_ft),
              "--unit", "ft",
              "--ext_thk_mm", "230", "--int_thk_mm", "115",
-             "--walls", walls_json,
+             "--walls", str(walls_candidate),
              "--out_json", str(DATA_OUTPUT / "qty_india.json"),
              "--out_csv",  str(DATA_OUTPUT / "qty_india.csv")])
         run([sys.executable, "src/qty_india_extras.py",
@@ -108,7 +147,7 @@ def main():
              "--out_csv",  str(DATA_OUTPUT / "qty_india_total.csv")])
 
     # 2) USA quantities
-    if args.mode in ("usa","both","all"):
+    if args.mode in ("usa", "both", "all"):
         run([sys.executable, "src/qty_usa.py",
              "--height_ft", str(args.us_height_ft),
              "--spacing_in", "16", "--stud_size", "2x4",
@@ -119,7 +158,7 @@ def main():
              "--out_csv",  str(DATA_OUTPUT / "qty_usa.csv")])
 
     # 3) Rates + XLSX/PDF summary export
-    if args.mode in ("both","all","india","usa"):
+    if args.mode in ("both", "all", "india", "usa"):
         run([sys.executable, "src/rates_export.py",
              "--prices", args.prices,
              "--in_json", str(DATA_OUTPUT / "qty_india_total.json"),
@@ -154,6 +193,7 @@ def main():
 
     print("\nOK: Pipeline completed.")
     print("Artifacts in:", OUTDIR.resolve())
+
 
 if __name__ == "__main__":
     main()

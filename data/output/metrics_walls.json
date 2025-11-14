@@ -1,11 +1,7 @@
 {
-  "segments": [
-    {
-      "id": 1,
-      "width_ft": 10.0,
-      "height_ft": 10.0,
-      "perimeter_ft": 40.0
-    }
-  ],
-  "total_perimeter_ft": 40.0
+  "source": "ocr",
+  "walls": [],
+  "totals": {
+    "total_wall_length_ft": 0
+  }
 }
